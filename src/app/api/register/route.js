@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { connectToDB } from "@/utils/database";
-import { User } from "@/models/user.model";
+import { UserModel } from "@/models/user.model";
 
 export async function POST(req, res) {
   try {
@@ -9,7 +9,7 @@ export async function POST(req, res) {
     const { username, email, password } = await req.json();
     console.log({ username, email, password });
 
-    const exists = await User.findFirst({
+    const exists = await UserModel.findFirst({
       where: {
         OR: [{ username: username }, { email: email }],
       },
@@ -26,7 +26,7 @@ export async function POST(req, res) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({
+    await UserModel.create({
       data: {
         username: username,
         email: email,

@@ -1,6 +1,7 @@
-import { User } from "@/models/user.model";
+import { UserModel } from "@/models/user.model";
 import { connectToDB } from "@/utils/database";
 import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 
@@ -25,7 +26,9 @@ export const authOptions = {
       console.log("AUTHDEB SESSION---------", session, "TOKEN---------", token);
       try {
         connectToDB();
-        const sessionUser = await User.findOne({ email: session.user.email });
+        const sessionUser = await UserModel.findOne({
+          email: session.user.email,
+        });
         session.user.id = sessionUser._id.toString();
         return session;
       } catch (error) {
@@ -60,7 +63,7 @@ export const authOptions = {
         try {
           connectToDB();
           const { email, password } = credentials;
-          const user = await User.findOne({ email });
+          const user = await UserModel.findOne({ email });
 
           if (!user) {
             throw new Error("User not found");

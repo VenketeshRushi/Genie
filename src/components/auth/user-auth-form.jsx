@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -10,12 +10,38 @@ import { ImSpinner9 } from "react-icons/im";
 import { IoLogoGithub } from "react-icons/io";
 import { FcGoogle } from "react-icons/fc";
 import { usePathname } from "next/navigation";
+import { signIn, signOut, useSession, getProviders } from "next-auth/react";
 
 function UserAuthForm({ className, ...props }) {
   const pathName = usePathname();
+  const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
+  const [providers, setProviders] = useState(null);
 
   console.log("pathName", pathName);
+
+  useEffect(() => {
+    console.log("session", session);
+    if (session === undefined) return;
+
+    if (session && !session?.user?.uid) {
+      // if session has no uid then user was not created. Sign out. This is when user signs in with google and has no role/invite
+      return async () =>
+        await signOut({ callbackUrl: session?.user?.redirect });
+    }
+
+    if (session) {
+      router.push("/playground");
+    }
+    console.log("SESSION", session);
+    const setUpProviders = async () => {
+      console.log("setUpProviders", Date.now());
+      const response = await getProviders();
+      console.log("providers", response, Date.now());
+      setProviders(response);
+    };
+    setUpProviders();
+  }, [session]);
 
   async function onSubmit(event) {
     event.preventDefault();
@@ -25,6 +51,18 @@ function UserAuthForm({ className, ...props }) {
       setIsLoading(false);
     }, 3000);
   }
+
+  const hadnleAuth = async (id) => {
+    try {
+      signIn(id, {
+        callback: () => {
+          // alert("signedIn");
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className={cn("grid gap-6", className)} {...props}>
@@ -83,7 +121,12 @@ function UserAuthForm({ className, ...props }) {
           )}{" "}
           Google
         </Button>
-        <Button variant="outline" type="button" disabled={isLoading}>
+        <Button
+          variant="outline"
+          type="button"
+          disabled={isLoading}
+          onClick={hadnleAuth}
+        >
           {isLoading ? (
             <ImSpinner9 className="mr-2 h-4 w-4 animate-spin" />
           ) : (

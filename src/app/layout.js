@@ -3,7 +3,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { fontMono } from "@/lib/font";
 import { siteConfig } from "@/config/site";
-import { ThemeProvider } from "@/components/Provider";
+import { Provider, ThemeProvider } from "@/components/Provider";
 import { Toaster } from "@/components/ui/toaster";
 // import { SiteFooter } from "@/components/site-footer";
 // import { SiteHeader } from "@/components/site-header";
@@ -79,21 +79,23 @@ export default function RootLayout({ children }) {
           fontMono.className
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div vaul-drawer-wrapper="">
-            <div className="relative flex min-h-screen flex-col bg-background">
-              {/* <SiteHeader /> */}
-              <main className="flex-1">{children}</main>
-              <Toaster />
-              {/* <SiteFooter /> */}
+        <Provider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div vaul-drawer-wrapper="">
+              <div className="relative flex min-h-screen flex-col bg-background">
+                {/* <SiteHeader /> */}
+                <main className="flex-1">{children}</main>
+                <Toaster />
+                {/* <SiteFooter /> */}
+              </div>
             </div>
-          </div>
-        </ThemeProvider>
+          </ThemeProvider>
+        </Provider>
       </body>
     </html>
   );
